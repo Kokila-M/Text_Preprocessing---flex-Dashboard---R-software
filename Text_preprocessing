@@ -1,0 +1,146 @@
+---
+title: '"Text Preprocessing"'
+author: '"kokila M"'
+date: '2022-05-31'
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+```{r} setup, include=FALSE}
+attach(data)
+attach(data)
+library(tidytext)
+library(tidyr)
+library(dplyr)
+library(stopwords)
+library(igraph)
+library(ggplot2)
+library(wordcloud2)
+edu=read.csv(file.choose(),header = TRUE)
+new_edu=edu[c("Title")]
+
+```
+
+
+###About Dataset
+This is an educational dataset which contains from Udemy which contains course Title, Summary,	Enrollment,	Stars,	Rating,	Link,	Category.This Dataset says about the Tittle of the subject, Sumamary the course outline with rating of the course .In this most using stop_words,tokenization, word count, n grams,etc.,  
+
+
+
+###Dataset 
+
+```{r}
+edu=head(edu,100)
+str(edu)
+```
+
+
+###Text Preprocessing
+###Tokenization
+
+```{r}
+{r}
+data_tokens = unnest_tokens(new_edu, word,Title)
+head(data_tokens,100)
+```
+
+###stopword
+
+```{r}
+tokens_stop=data_tokens %>% filter(!word %in% stop_words$word)
+head(tokens_stop,100)
+```
+
+
+##N-grams
+
+```{r}
+ng = edu %>% unnest_tokens(word,Summary, token = "ngrams", n=2)%>%
+  separate(word, c("word1","word2"),sep = " ") %>% filter(!word1 %in% stop_words$word)%>%
+  filter(!word2 %in% stop_words$word)%>% unite(word, word1,word2,sep=" ")%>%
+  count(word, sort =TRUE)
+head(ng,100)
+```
+
+###Separate
+
+```{r}
+
+s=ng%>%separate(word,c("word1","word2"),sep = " ")
+cn=s %>% filter(n>=2)
+head(cn,100)
+
+```
+
+
+
+##Word Count
+
+
+
+```{r}
+wor=cn %>% count(word1,word2,directed=TRUE) %>% graph_from_data_frame()
+wor
+```
+
+
+
+
+##word frequency
+
+```{r}
+word_freq=tokens_stop %>% count(word,sort = TRUE)
+head(word_freq,100)
+```
+
+##Wordcloud
+```{r}
+
+wordcloud2(data = word_freq, size=0.4, color = "random-light",shape="circle")
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the *Knit* button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Including Plots
+
+You can also embed plots, for example:
+
+{r pressure, echo=FALSE}
+plot(pressure)
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
